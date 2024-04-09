@@ -1,0 +1,9 @@
+diff a/새 폴더/program2.c b/새 폴더/program2.c	(rejected hunks)
+@@ -0,0 +1,6 @@
++#include <stdio.h>
++
++void main(){
++    printf("bye world!");
++    return 0;
++}
+\ No newline at end of file
