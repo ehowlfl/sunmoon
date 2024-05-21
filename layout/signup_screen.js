@@ -5,9 +5,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 const Stack = createStackNavigator();
 
 // 버튼 컴포넌트: 사용자 정의 스타일이 적용된 재사용 가능한 버튼 컴포넌트
-const Button = ({ title, onPress, style }) => {
+const Button = ({ title, onPress, style, disabled }) => {
   return (
-    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, style]} onPress={onPress} disabled={!isValid}>
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
   );
@@ -20,7 +20,8 @@ const SignupScreen = ({ navigation }) => {
   const [passwordValue, setPasswordValue] = useState("");
   const [passwordConfirmValue, setPasswordConfirmValue] = useState("");
   const [nameValue, setNameValue] = useState("");
-
+  const [passwordRequirements, setPasswordRequirements] =useState("");
+  const [isValid, setisValid] = useState(false);
   // 중복되는 ID인지 확인하는 함수
   const checkUserIdExists = useCallback(async (userId) => {
     try {
@@ -79,25 +80,29 @@ const SignupScreen = ({ navigation }) => {
     }
 
     //비밀번호 조건값 대조
-    const passwordRequirements(){
-      upperCount=0, lowerCount=0, numericCount;
-      
-      if(length(passwordValue) >= 8 && length(passwordValue) <= 16){
-        for(i=0;i>length(passwordValue);i++){
-          if(passwordValue[i] <= 97 && passwordValue[i] >= 122){ //
-            lowerCount++;
-          }
-          if(passwordValue[i] <= 65 && passwordValue[i] >= 90){
-            upperCount++;
-          }
-          if(passwordValue[i] <=48  && passwordValue[i] >= 57){
-            numericCount++;
-          }
-        }
-        if(lowerCount <= 3 && upperCount <= 3 && numericCount <= 2)
-          passwordRequirements = true;
+function passwordRequirements(passwordValue) {
+  let upperCount = 0, lowerCount = 0, numericCount = 0;
+  if(passwordValue.length >= 8 && passwordValue.length <= 16) {
+    for(let i = 0; i < passwordValue.length; i++) {
+      if(passwordValue.charCodeAt(i) >= 97 && passwordValue.charCodeAt(i) <= 122) { // 소문자
+        lowerCount++;
+      }
+      if(passwordValue.charCodeAt(i) >= 65 && passwordValue.charCodeAt(i) <= 90) { // 대문자
+        upperCount++;
+      }
+      if(passwordValue.charCodeAt(i) >= 48 && passwordValue.charCodeAt(i) <= 57) { // 숫자
+        numericCount++;
       }
     }
+    if(lowerCount >= 3 && upperCount >= 3 && numericCount >= 2) {
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+}
+
 
     // 서버에 회원가입 요청
     fetch("http://localhost:8080/users", {
@@ -170,7 +175,7 @@ const SignupScreen = ({ navigation }) => {
           />
         </View>
         {/* 회원가입 버튼 */}
-        <Button title="회원가입" onPress={handleSignup} style={styles.signupButton} />
+        <Button title="회원가입" onPress={handleSignup} disabled={!isValid} style={styles.signupButton} />
       </View>
       <View style={styles.footer} />
     </SafeAreaView>
